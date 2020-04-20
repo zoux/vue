@@ -1,6 +1,21 @@
 # vue-analysis
 
+## vue 实例化流程总结
+
+1. $mount 流程开始
+2. 获取 render，或将 template 转换成 render
+3. 调用 render 生成 VNode
+4. 调用 update 触发 patch 生成组件，并 insert DOM
+
+![](https://ustbhuangyi.github.io/vue-analysis/assets/new-vue.png)
+
+
+
+## 相关资料
+
 [源码资料](https://ustbhuangyi.github.io/vue-analysis)
+
+
 
 ## 各章总结
 
@@ -29,8 +44,6 @@ Vue 本质上就是一个用 Function 实现的 Class，通过各种 mixin 扩�
 
 
 ### 数据驱动
-
-![](https://ustbhuangyi.github.io/vue-analysis/assets/new-vue.png)
 
 #### new Vue 发生了什么
 
@@ -105,3 +118,20 @@ createComponent 的关键步骤：
 > Vue.extend 的作用就是构造一个 Vue 的子类。
 
 #### patch
+
+组件同样从 `vm.__patch__` 开始，经过 createElm、createComponent、init(利用 createComponentInstanceForVnode 创建一个 Vue 的实例，然后调用 child.$mount 方法挂载子组件)。
+
+> createComponentInstanceForVnode 中的 vnode.componentOptions.Ctor 对应的就是子组件的构造函数；
+> activeInstance 为当前激活的 vm 实例；vm.$vnode 为组件的占位节点的 VNode；vm._vnode 为组件的真实渲染 VNode。
+
+> 创建实例时通过触发 Vue.prototype._init 中的 initInternalComponent 来给组件的 $options 赋值。
+
+> createComponent 遍历子节点，若为非组件节点则 createChildren 创建子元素，若为组件节点则递归调用 createComponent。
+
+#### 合并配置
+
+options 的合并有 2 种方式，子组件初始化过程通过 initInternalComponent 方式要比外部初始化 Vue 通过 mergeOptions 的过程要快，合并完的结果保留在 vm.$options 中。
+
+#### 生命周期
+
+
