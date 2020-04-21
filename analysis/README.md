@@ -64,7 +64,7 @@ mountComponent 方法的核心是先实例化一个渲染 Watcher，在它的回
 
 #### render
 
-vm._render 最终是通过执行 createElement 方法并返回的是 VNode。
+vm._render 最终是通过执行 _createElement 方法并返回的是 VNode。
 
 #### Virtual DOM
 
@@ -78,7 +78,7 @@ VNode 是对真实 DOM 的一种抽象描述，它的核心定义无非就几个
 
 #### createElement
 
-createElement 会对参数 tag 进行判断：
+_createElement 会对参数 tag 进行判断：
 * 如果是一个普通的 html 标签，像上一章的例子那样是一个普通的 div，则会实例化一个普通 VNode 节点。
 * 否则通过 createComponent 方法创建一个组件 VNode。
 
@@ -133,5 +133,21 @@ createComponent 的关键步骤：
 options 的合并有 2 种方式，子组件初始化过程通过 initInternalComponent 方式要比外部初始化 Vue 通过 mergeOptions 的过程要快，合并完的结果保留在 vm.$options 中。
 
 #### 生命周期
+
+#### 组件注册
+
+全局注册通过 Vue.component 将组件的参数 option 通过 extend 构建成构造器，并挂载到 Vue.options.components 中。
+创建组件 VNode 是通过 _createElement 中的 resolveAsset(context.$options, 'components', tag) 获取到组件构造器作为 createComponent 的参数。
+
+局部注册在组件的 Vue 的实例化阶段有一个 mergeOptions 的逻辑，把 option components 合并到 vm.$options.components 上，这样就可以走 createElement -> createComponent 的创建途径了。
+
+局部注册和全局注册不同的是，只有该类型的组件才可以访问局部注册的子组件，
+而全局注册是扩展到 Vue.options 下，所以在所有组件创建的过程中，都会从全局的 Vue.options.components 扩展到当前组件的 vm.$options.components 下，这就是全局注册的组件能被任意使用的原因。
+
+
+
+### 深入响应式原理
+
+#### 响应式对象
 
 
