@@ -43,6 +43,7 @@ src
 Vue 本质上就是一个用 Function 实现的 Class，通过各种 mixin 扩展 prototype、通过 initGlobalAPI 扩展 static。
 
 
+
 ### 数据驱动
 
 #### new Vue 发生了什么
@@ -79,20 +80,21 @@ VNode 是对真实 DOM 的一种抽象描述，它的核心定义无非就几个
 #### createElement
 
 _createElement 会对参数 tag 进行判断：
-* 如果是一个普通的 html 标签，像上一章的例子那样是一个普通的 div，则会实例化一个普通 VNode 节点。
-* 否则通过 createComponent 方法创建一个组件 VNode。
+* 如果是一个普通的 html 标签，则会实例化一个普通 VNode 节点。
+* 否则通过 createComponent 方法创建一个组件 VNode 节点。
 
 #### update
 
 _update 的作用是把 VNode 渲染成真实的 DOM。它被调用的时机有 2 个，一个是首次渲染，一个是数据更新的时候。
 
-其核心就是调用 `vm.__patch__` 方法：
+其核心就是调用 `vm.__patch__(prevVnode, currentVnode)` 方法：
 1. patch 主要调用了 createElm(通过虚拟节点创建真实的 DOM 并插入到它的父节点中)。
 2. createElm 主要调用了 createComponent(尝试创建子组件)、createChildren(创建子元素)、insert(把 DOM 插入到父节点中)。
 
 > createChildren 实际上是遍历子虚拟节点，递归调用 createElm，这是一种常用的深度优先的遍历算法。
 
 > 因为是递归调用，子元素会优先调用 insert，所以整个 vnode 树节点的插入顺序是先子后父。
+
 
 
 ### 组件化
@@ -133,6 +135,10 @@ createComponent 的关键步骤：
 options 的合并有 2 种方式，子组件初始化过程通过 initInternalComponent 方式要比外部初始化 Vue 通过 mergeOptions 的过程要快，合并完的结果保留在 vm.$options 中。
 
 #### 生命周期
+
+生命周期函数就是在初始化及数据更新过程各个阶段执行不同的钩子函数。`callHook(vm, ${hookName})`
+
+created 钩子函数中可以访问到数据，在 mounted 钩子函数中可以访问到 DOM，在 destroy 钩子函数中可以做一些定时器销毁工作。
 
 #### 组件注册
 
